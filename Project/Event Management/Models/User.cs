@@ -33,6 +33,6 @@ namespace Event_Management.Models
 
         public string Email { get; set; }
 
-        //public ICollection<Event> Events { get; set; }
+        public ICollection<Event> Events { get; set; }
     }
 }
