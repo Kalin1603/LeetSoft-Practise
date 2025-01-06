@@ -18,10 +18,6 @@ namespace Event_Management.Models
         [StringLength(150)]
         public string PhoneNumber { get; set; }
 
-        [Required]
-        [Range(10, 18)]
-        public int Age { get; set; }
-
         [StringLength(100)]
         public string Address { get; set; }
 
