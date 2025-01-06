@@ -14,17 +14,11 @@ namespace Event_Management.Models
         [StringLength(50)]
         public string LastName { get; set; }
 
-        [Required]
-        [StringLength(150)]
-        public string PhoneNumber { get; set; }
-
         [StringLength(100)]
         public string Address { get; set; }
 
         [Required]
         public DateTime DateOfBirth { get; set; }
-
-        public string Email { get; set; }
 
         public ICollection<Event> Events { get; set; }
     }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Event_Management.Data;
 using Event_Management.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Event_Management.Controllers
 {
@@ -20,12 +21,14 @@ namespace Event_Management.Controllers
         }
 
         // GET: Events
+        [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Events.ToListAsync());
         }
 
         // GET: Events/Details/5
+        [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,6 +47,7 @@ namespace Event_Management.Controllers
         }
 
         // GET: Events/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -53,6 +57,7 @@ namespace Event_Management.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,DateTime,Location")] Event @event)
         {
@@ -66,6 +71,7 @@ namespace Event_Management.Controllers
         }
 
         // GET: Events/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,6 +92,7 @@ namespace Event_Management.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,DateTime,Location")] Event @event)
         {
             if (id != @event.Id)
@@ -117,6 +124,7 @@ namespace Event_Management.Controllers
         }
 
         // GET: Events/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -136,6 +144,7 @@ namespace Event_Management.Controllers
 
         // POST: Events/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

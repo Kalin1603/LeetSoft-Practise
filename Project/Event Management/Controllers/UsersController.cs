@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Event_Management.Data;
 using Event_Management.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Event_Management.Controllers
 {
     public class UsersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public UsersController(ApplicationDbContext context)
+         public UsersController(ApplicationDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Users
@@ -49,8 +52,13 @@ namespace Event_Management.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
-            ViewData["EventId"] = new SelectList(_context.Events, "Id", "Description");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            var users = _userManager.Users.ToList();  // Извличаме потребителите от Identity
+            var events = _context.Events.ToList();    // Извличаме събитията от базата
+
+            // Проверка дали има потребители и събития
+            ViewData["Users"] = users ?? new List<User>();
+            ViewData["Events"] = events ?? new List<Event_Management.Models.Event>();
+
             return View();
         }
 
@@ -61,14 +69,25 @@ namespace Event_Management.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,UserId,EventId,Status")] UserEvent userEvent)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid)  // Проверка дали моделът е валиден
             {
+                // Задаваме статус на "Invited"
+                userEvent.Status = "Invited";
+
+                // Добавяме събитието към базата
                 _context.Add(userEvent);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                // Показваме съобщение за успешната покана
+                TempData["SuccessMessage"] = $"User {userEvent.User.FirstName} has been invited to the event {userEvent.Event.Title}.";
+
+                // Пренасочваме към Index на събитията
+                return RedirectToAction("Index", "Events");
             }
+
+            // Ако има грешки, зареждаме отново събития и потребители в dropdown менютата
             ViewData["EventId"] = new SelectList(_context.Events, "Id", "Description", userEvent.EventId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userEvent.UserId);
+            ViewData["UserId"] = new SelectList(_userManager.Users, "Id", "UserName", userEvent.UserId);
             return View(userEvent);
         }
 
