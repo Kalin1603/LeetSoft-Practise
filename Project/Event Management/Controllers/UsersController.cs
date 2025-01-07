@@ -22,10 +22,27 @@ namespace Event_Management.Controllers
             _userManager = userManager;
         }
 
+        //Get: All Users
+        public async Task<IActionResult> Index()
+        {
+            var userEvents = await _context.UserEvents
+                .Include(ue => ue.User)
+                .Include(ue => ue.Event)
+                .ToListAsync();
+
+            return View(userEvents);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
-            // Филтриране само на потребители с роля "User"
             var userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "User");
+            if (userRole == null)
+            {
+                TempData["ErrorMessage"] = "Role 'User' does not exist. Please seed the database.";
+                return RedirectToAction("Index", "Events");
+            }
+
             var usersInRole = await _context.UserRoles
                 .Where(ur => ur.RoleId == userRole.Id)
                 .Select(ur => ur.UserId)
@@ -49,23 +66,44 @@ namespace Event_Management.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(userEvent);
+                var existingUserEvent = await _context.UserEvents
+                    .FirstOrDefaultAsync(ue => ue.UserId == userEvent.UserId && ue.EventId == userEvent.EventId);
+
+                if (existingUserEvent != null)
+                {
+                    // Ако съществува покана, проверяваме дали не е вече поканен
+                    if (existingUserEvent.Status == "Invited")
+                    {
+                        TempData["ErrorMessage"] = "This user is already invited to this event.";
+                    }
+                    else
+                    {
+                        existingUserEvent.Status = "Invited";
+                        _context.UserEvents.Update(existingUserEvent);
+                        await _context.SaveChangesAsync();
+                    }
+                    return RedirectToAction("Index", "Users");
+                }
+
+                try
+                {
+                    userEvent.Status = "Invited";
+                    _context.UserEvents.Add(userEvent);
+                    await _context.SaveChangesAsync();
+
+                    Console.WriteLine("User status created successfully.");
+                    return RedirectToAction("Index", "Users"); 
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                    TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+                    return View(userEvent);
+                }
             }
 
-            try
-            {
-                userEvent.Status = "Invited";
-                _context.UserEvents.Add(userEvent);
-                await _context.SaveChangesAsync();
-
-                // Пренасочване към Events/Index след успешна покана
-                return RedirectToAction("Index", "Events");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
-                return View(userEvent);
-            }
+            TempData["ErrorMessage"] = "Invalid form data.";
+            return View(userEvent);
         }
 
         // GET: Users/Edit/5
@@ -86,9 +124,6 @@ namespace Event_Management.Controllers
             return View(userEvent);
         }
 
-        // POST: Users/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,EventId,Status")] UserEvent userEvent)
@@ -132,9 +167,11 @@ namespace Event_Management.Controllers
             }
 
             var userEvent = await _context.UserEvents
-                .Include(u => u.Event)
-                .Include(u => u.User)
+                .Include(ue => ue.User)
+                .Include(ue => ue.Event)
+                .Where(ue => ue.User.UserName != "admin") 
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (userEvent == null)
             {
                 return NotFound();
@@ -143,8 +180,9 @@ namespace Event_Management.Controllers
             return View(userEvent);
         }
 
-        // GET: Users/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+
+        // GET: Users/Uninvite/5
+        public async Task<IActionResult> Uninvite(int? id)
         {
             if (id == null)
             {
@@ -152,31 +190,20 @@ namespace Event_Management.Controllers
             }
 
             var userEvent = await _context.UserEvents
-                .Include(u => u.Event)
-                .Include(u => u.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (userEvent == null)
             {
                 return NotFound();
             }
 
-            return View(userEvent);
-        }
-
-        // POST: Users/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var userEvent = await _context.UserEvents.FindAsync(id);
-            if (userEvent != null)
-            {
-                _context.UserEvents.Remove(userEvent);
-            }
-
+            userEvent.Status = "Uninvited";
+            _context.UserEvents.Update(userEvent);
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool UserEventExists(int id)
         {

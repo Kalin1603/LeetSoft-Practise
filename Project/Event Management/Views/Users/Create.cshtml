@@ -13,16 +13,23 @@
 
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="Create">
+        <form asp-action="Create" asp-controller="Users">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
                 <label asp-for="UserId" class="form-label">Select User</label>
                 <select asp-for="UserId" class="form-select">
                     <option value="">-- Select User --</option>
-                    @foreach (var user in (IEnumerable<Event_Management.Models.User>)ViewData["Users"])
+                    @if (ViewData["Users"] != null && ((IEnumerable<Event_Management.Models.User>)ViewData["Users"]).Any())
                     {
-                        <option value="@user.Id">@user.FirstName @user.LastName</option>
+                        foreach (var user in (IEnumerable<Event_Management.Models.User>)ViewData["Users"])
+                        {
+                            <option value="@user.Id">@user.FirstName @user.LastName</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="" disabled>No users available</option>
                     }
                 </select>
                 <span asp-validation-for="UserId" class="text-danger"></span>
@@ -32,9 +39,16 @@
                 <label asp-for="EventId" class="form-label">Select Event</label>
                 <select asp-for="EventId" class="form-select">
                     <option value="">-- Select Event --</option>
-                    @foreach (var ev in (IEnumerable<Event_Management.Models.Event>)ViewData["Events"])
+                    @if (ViewData["Events"] != null && ((IEnumerable<Event_Management.Models.Event>)ViewData["Events"]).Any())
                     {
-                        <option value="@ev.Id">@ev.Title</option>
+                        foreach (var ev in (IEnumerable<Event_Management.Models.Event>)ViewData["Events"])
+                        {
+                            <option value="@ev.Id">@ev.Title</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="" disabled>No events available</option>
                     }
                 </select>
                 <span asp-validation-for="EventId" class="text-danger"></span>
