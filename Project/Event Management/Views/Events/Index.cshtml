@@ -6,6 +6,15 @@
 
 <h1>All Incoming Events</h1>
 
+@using (Html.BeginForm("Index", "Events", FormMethod.Get))
+{
+    <p>
+        Title: <input type="text" name="searchTitle" value="@ViewData["SearchTitle"]" />
+        Date: <input type="date" name="searchDate" value="@ViewData["SearchDate"]" />
+        <input type="submit" value="Search" class="btn btn-primary" />
+    </p>
+}
+
 <table class="table">
     <thead>
         <tr>

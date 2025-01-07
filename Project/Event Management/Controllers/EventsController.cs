@@ -22,10 +22,29 @@ namespace Event_Management.Controllers
 
         // GET: Events
         [Authorize(Roles = "Admin, User")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchTitle, DateTime? searchDate, string searchLocation)
         {
-            return View(await _context.Events.ToListAsync());
+            
+            ViewData["SearchTitle"] = searchTitle;
+            ViewData["SearchDate"] = searchDate?.ToString("yyyy-MM-dd");
+
+            
+            var eventsQuery = _context.Events.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTitle))
+            {
+                eventsQuery = eventsQuery.Where(e => e.Title.Contains(searchTitle));
+            }
+
+            if (searchDate.HasValue)
+            {
+                eventsQuery = eventsQuery.Where(e => e.DateTime.Date == searchDate.Value.Date);
+            }
+
+            var events = await eventsQuery.ToListAsync();
+            return View(events);
         }
+
 
         // GET: Events/Details/5
         [Authorize(Roles = "Admin, User")]
