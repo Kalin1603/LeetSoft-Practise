@@ -16,79 +16,56 @@ namespace Event_Management.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
 
-         public UsersController(ApplicationDbContext context, UserManager<User> userManager)
+        public UsersController(ApplicationDbContext context, UserManager<User> userManager)
         {
             _context = context;
             _userManager = userManager;
         }
 
-        // GET: Users
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Create()
         {
-            var applicationDbContext = _context.UserEvents.Include(u => u.Event).Include(u => u.User);
-            return View(await applicationDbContext.ToListAsync());
-        }
+            // Филтриране само на потребители с роля "User"
+            var userRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "User");
+            var usersInRole = await _context.UserRoles
+                .Where(ur => ur.RoleId == userRole.Id)
+                .Select(ur => ur.UserId)
+                .ToListAsync();
 
-        // GET: Users/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var users = _userManager.Users
+                .Where(u => usersInRole.Contains(u.Id))
+                .ToList();
 
-            var userEvent = await _context.UserEvents
-                .Include(u => u.Event)
-                .Include(u => u.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (userEvent == null)
-            {
-                return NotFound();
-            }
+            var events = _context.Events.ToList();
 
-            return View(userEvent);
-        }
-
-        // GET: Users/Create
-        public IActionResult Create()
-        {
-            var users = _userManager.Users.ToList();  // Извличаме потребителите от Identity
-            var events = _context.Events.ToList();    // Извличаме събитията от базата
-
-            // Проверка дали има потребители и събития
             ViewData["Users"] = users ?? new List<User>();
-            ViewData["Events"] = events ?? new List<Event_Management.Models.Event>();
+            ViewData["Events"] = events ?? new List<Event>();
 
             return View();
         }
 
-        // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,EventId,Status")] UserEvent userEvent)
+        public async Task<IActionResult> Create([Bind("UserId,EventId")] UserEvent userEvent)
         {
-            if (ModelState.IsValid)  // Проверка дали моделът е валиден
+            if (!ModelState.IsValid)
             {
-                // Задаваме статус на "Invited"
-                userEvent.Status = "Invited";
-
-                // Добавяме събитието към базата
-                _context.Add(userEvent);
-                await _context.SaveChangesAsync();
-
-                // Показваме съобщение за успешната покана
-                TempData["SuccessMessage"] = $"User {userEvent.User.FirstName} has been invited to the event {userEvent.Event.Title}.";
-
-                // Пренасочваме към Index на събитията
-                return RedirectToAction("Index", "Events");
+                return View(userEvent);
             }
 
-            // Ако има грешки, зареждаме отново събития и потребители в dropdown менютата
-            ViewData["EventId"] = new SelectList(_context.Events, "Id", "Description", userEvent.EventId);
-            ViewData["UserId"] = new SelectList(_userManager.Users, "Id", "UserName", userEvent.UserId);
-            return View(userEvent);
+            try
+            {
+                userEvent.Status = "Invited";
+                _context.UserEvents.Add(userEvent);
+                await _context.SaveChangesAsync();
+
+                // Пренасочване към Events/Index след успешна покана
+                return RedirectToAction("Index", "Events");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+                return View(userEvent);
+            }
         }
 
         // GET: Users/Edit/5
@@ -143,6 +120,26 @@ namespace Event_Management.Controllers
             }
             ViewData["EventId"] = new SelectList(_context.Events, "Id", "Description", userEvent.EventId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userEvent.UserId);
+            return View(userEvent);
+        }
+
+        // GET: Users/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var userEvent = await _context.UserEvents
+                .Include(u => u.Event)
+                .Include(u => u.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (userEvent == null)
+            {
+                return NotFound();
+            }
+
             return View(userEvent);
         }
 
