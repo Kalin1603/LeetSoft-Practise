@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Event_Management.Data;
 using Event_Management.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace Event_Management.Controllers
 {
@@ -202,6 +203,27 @@ namespace Event_Management.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Stats()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Gets current logged user
+
+            // Total events created by the user
+            var totalEvents = _context.Events
+                .Where(e => e.CreatorId == userId)
+                .ToList();
+            ViewBag.TotalEventsCount = totalEvents.Count;
+
+            // Participants that confirmed their attendance over all invited
+            var participants = _context.UserEvents
+                .Where(ue => ue.Event.CreatorId == userId && (ue.Status == "Confirmed" || ue.Status == "Invited"))
+                .ToList();
+            var participantsCount = participants.Count;
+            var confirmedParticipantsCount = participants.Count(ue => ue.Status == "Confirmed");
+            ViewBag.ConfirmedParticipantsPercentage = (double)confirmedParticipantsCount / participantsCount * 100;
+
+            return View();
         }
 
 

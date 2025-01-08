@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Event_Management.Data;
 using Event_Management.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Event_Management.Controllers
 {
@@ -82,6 +83,9 @@ namespace Event_Management.Controllers
         {
             if (ModelState.IsValid)
             {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                @event.CreatorId = userId;
+
                 _context.Add(@event);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Event_Management.Models
 {
@@ -6,6 +7,10 @@ namespace Event_Management.Models
     {
         [Key]
         public int Id { get; set; }
+
+        [ForeignKey(nameof(User))]
+        public string? CreatorId { get; set; }
+        public User? Creator { get; set; }
 
         [Required]
         [StringLength(100)]
