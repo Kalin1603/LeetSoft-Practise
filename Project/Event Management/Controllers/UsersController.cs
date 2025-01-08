@@ -217,10 +217,10 @@ namespace Event_Management.Controllers
 
             // Participants that confirmed their attendance over all invited
             var participants = _context.UserEvents
-                .Where(ue => ue.Event.CreatorId == userId && (ue.Status == "Confirmed" || ue.Status == "Invited"))
+                .Where(ue => ue.Event.CreatorId == userId && (ue.Status == "Accepted" || ue.Status == "Invited"))
                 .ToList();
             var participantsCount = participants.Count;
-            var confirmedParticipantsCount = participants.Count(ue => ue.Status == "Confirmed");
+            var confirmedParticipantsCount = participants.Count(ue => ue.Status == "Accepted");
             ViewBag.ConfirmedParticipantsPercentage = (double)confirmedParticipantsCount / participantsCount * 100;
 
             return View();
