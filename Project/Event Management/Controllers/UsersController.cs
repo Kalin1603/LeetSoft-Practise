@@ -153,7 +153,7 @@ namespace Event_Management.Controllers
 
                 if (userEvents != null)
                 {
-                    TempData["ErrorMessage"] = "UserEvent with these IDs already exists!";
+                    TempData["ErrorMessage"] = "User with this title event already exists!";
                     ViewData["EventId"] = new SelectList(
                         _context.Events.Select(e => new { e.Id, e.Title }),
                         "Id", "Title", userEvent.EventId

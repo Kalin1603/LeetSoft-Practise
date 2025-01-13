@@ -8,7 +8,11 @@
     <!-- Header Section -->
     <div class="text-center mb-4">
         <h1 class="display-4 text-warning fw-bold">Edit User status</h1>
-        <p class="lead text-muted">Update the invitation and the status of the user.</p>
+        <p class="lead text-muted">Update the invitation for an event of the user.</p>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        }
     </div>
 
     <!-- Edit Form Section -->
