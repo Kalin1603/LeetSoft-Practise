@@ -12,6 +12,13 @@
         <a class="btn btn-primary" asp-action="Stats">Statistics</a>
     </div>
 
+    <div class="text-center mb-4">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        }
+    </div>
+
     <!-- Events Table -->
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">

@@ -83,7 +83,7 @@ namespace Event_Management.Controllers
                         _context.UserEvents.Update(existingUserEvent);
                         await _context.SaveChangesAsync();
                     }
-                    return RedirectToAction("Index", "Users");
+                    return RedirectToAction("Create", "Users");
                 }
 
                 try
@@ -92,7 +92,7 @@ namespace Event_Management.Controllers
                     _context.UserEvents.Add(userEvent);
                     await _context.SaveChangesAsync();
 
-                    Console.WriteLine("User status created successfully.");
+                    TempData["SuccessMessage"] = "The invitation has been sent successfully.";
                     return RedirectToAction("Index", "Users"); 
                 }
                 catch (Exception ex)
@@ -115,47 +115,65 @@ namespace Event_Management.Controllers
                 return NotFound();
             }
 
-            var userEvent = await _context.UserEvents.FindAsync(id);
+            var userEvent = await _context.UserEvents
+                .Include(ue => ue.User)
+                .Include(ue => ue.Event)
+                .FirstOrDefaultAsync(ue => ue.Id == id);
+
             if (userEvent == null)
             {
                 return NotFound();
             }
-            ViewData["EventId"] = new SelectList(_context.Events, "Id", "Description", userEvent.EventId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userEvent.UserId);
+
+            else
+            {
+                ViewData["EventId"] = new SelectList(
+                    _context.Events.Select(e => new { e.Id, e.Title }),
+                    "Id", "Title", userEvent.EventId);
+            }
             return View(userEvent);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,EventId,Status")] UserEvent userEvent)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,EventId")] UserEvent userEvent)
         {
             if (id != userEvent.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
+                var userEvents = await _context.UserEvents
+                .Include(ue => ue.User)
+                .Include(ue => ue.Event)
+                .FirstOrDefaultAsync(ue => ue.UserId == userEvent.UserId && ue.EventId == userEvent.EventId);
+
+                if (userEvents != null)
                 {
-                    _context.Update(userEvent);
+                    TempData["ErrorMessage"] = "UserEvent with these IDs already exists!";
+                    return View(userEvent);
+                }
+
+                var existingUserEvent = await _context.UserEvents.FindAsync(id);
+
+                if (existingUserEvent != null)
+                {
+                    existingUserEvent.EventId = userEvent.EventId;
+
+                    _context.Update(existingUserEvent);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserEventExists(userEvent.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EventId"] = new SelectList(_context.Events, "Id", "Description", userEvent.EventId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userEvent.UserId);
+            ViewData["EventId"] = new SelectList(
+                _context.Events.Select(e => new { e.Id, e.Title }),
+                "Id", "Title", userEvent.EventId
+            );
+
             return View(userEvent);
         }
 
