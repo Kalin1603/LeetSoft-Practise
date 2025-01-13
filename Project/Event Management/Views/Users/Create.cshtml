@@ -4,57 +4,90 @@
     ViewData["Title"] = "Invite User";
 }
 
-<h1>Invite User</h1>
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h1 class="display-4 text-primary fw-bold">Create a New Event</h1>
+        <p class="lead text-muted">Fill in the details below to add your event.</p>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        }
+    </div>
 
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-}
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="h5 mb-0">Event Details</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" asp-controller="Users">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <!-- User -->
+                        <div class="mb-3">
+                            <label asp-for="UserId" class="form-label">Select User</label>
+                            <select asp-for="UserId" class="form-select">
+                                <option value="">-- Select User --</option>
+                                @if (ViewData["Users"] != null && ((IEnumerable<Event_Management.Models.User>)ViewData["Users"]).Any())
+                                {
+                                    foreach (var user in (IEnumerable<Event_Management.Models.User>)ViewData["Users"])
+                                    {
+                                        <option value="@user.Id">@user.FirstName @user.LastName</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled>No users available</option>
+                                }
+                            </select>
+                            <span asp-validation-for="UserId" class="text-danger"></span>
+                        </div>
 
-            <div class="mb-3">
-                <label asp-for="UserId" class="form-label">Select User</label>
-                <select asp-for="UserId" class="form-select">
-                    <option value="">-- Select User --</option>
-                    @if (ViewData["Users"] != null && ((IEnumerable<Event_Management.Models.User>)ViewData["Users"]).Any())
-                    {
-                        foreach (var user in (IEnumerable<Event_Management.Models.User>)ViewData["Users"])
-                        {
-                            <option value="@user.Id">@user.FirstName @user.LastName</option>
-                        }
-                    }
-                    else
-                    {
-                        <option value="" disabled>No users available</option>
-                    }
-                </select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
+                        <!-- Event -->
+                        <div class="mb-3">
+                            <label asp-for="EventId" class="form-label">Select Event</label>
+                            <select asp-for="EventId" class="form-select">
+                                <option value="">-- Select Event --</option>
+                                @if (ViewData["Events"] != null && ((IEnumerable<Event_Management.Models.Event>)ViewData["Events"]).Any())
+                                {
+                                    foreach (var ev in (IEnumerable<Event_Management.Models.Event>)ViewData["Events"])
+                                    {
+                                        <option value="@ev.Id">@ev.Title</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="" disabled>No events available</option>
+                                }
+                            </select>
+                            <span asp-validation-for="EventId" class="text-danger"></span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus-circle"></i> Create Event
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="EventId" class="form-label">Select Event</label>
-                <select asp-for="EventId" class="form-select">
-                    <option value="">-- Select Event --</option>
-                    @if (ViewData["Events"] != null && ((IEnumerable<Event_Management.Models.Event>)ViewData["Events"]).Any())
-                    {
-                        foreach (var ev in (IEnumerable<Event_Management.Models.Event>)ViewData["Events"])
-                        {
-                            <option value="@ev.Id">@ev.Title</option>
-                        }
-                    }
-                    else
-                    {
-                        <option value="" disabled>No events available</option>
-                    }
-                </select>
-                <span asp-validation-for="EventId" class="text-danger"></span>
+            <!-- Back to List -->
+            <div class="text-center mt-4">
+                <a asp-action="Index" class="btn btn-link text-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
             </div>
-
-            <button type="submit" class="btn btn-primary">Send Invitation</button>
-        </form>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

@@ -4,49 +4,61 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>User status</h1>
-<a class="btn btn-primary" asp-action="Stats">Stats</a>
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h1 class="display-4 text-primary fw-bold">Stats</h1>
+        <p class="lead text-muted">Browse and manage user statuses.</p>
+        <a class="btn btn-primary" asp-action="Stats">Statistics</a>
+    </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Event)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @item.User.FirstName @item.User.LastName
-                </td>
-                <td>
-                    @item.User.Email
-                </td>
-                <td>
-                    @item.Event.Title
-                </td>
-                <td>
-                    @item.Status
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Uninvite" asp-route-id="@item.Id">Uninvite</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <!-- Events Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-primary">
+                <tr class="text-center">
+                    <th>@Html.DisplayNameFor(model => model.User)</th>
+                    <th>@Html.DisplayNameFor(model => model.User.Email)</th>
+                    <th>@Html.DisplayNameFor(model => model.Event)</th>
+                    <th>@Html.DisplayNameFor(model => model.Status)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.User.FirstName @item.User.LastName</td>
+                            <td>@item.User.Email</td>
+                            <td>@item.Event.Title</td>
+                            <td>@item.Status</td>
+                            <td class="text-center">
+                                <a class="btn btn-warning btn-sm me-1" asp-action="Edit" asp-route-id="@item.Id">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a class="btn btn-info btn-sm me-1" asp-action="Details" asp-route-id="@item.Id">
+                                    <i class="fas fa-info-circle"></i> Details
+                                </a>
+                                <a class="btn btn-danger btn-sm" asp-action="Uninvite" asp-route-id="@item.Id">
+                                    <i class="fas fa-trash"></i> Uninvite
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No user stats found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+}

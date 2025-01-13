@@ -4,80 +4,94 @@
     ViewData["Title"] = "User Details";
 }
 
-<div>
-    <h4>User Information</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.User.FirstName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.User.FirstName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.User.LastName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.User.LastName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.User.DateOfBirth)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.User.DateOfBirth)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.User.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.User.Email)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.User.PhoneNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @if (string.IsNullOrEmpty(Model.User.PhoneNumber))
-            {
-                @:N/A
-            }
-            else
-            {
-                @Html.DisplayFor(model => model.User.PhoneNumber)
-            }
-        </dd>
-    </dl>
 
-    <h4>Event Information</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Event.Title)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Event.Title)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Event.Location)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Event.Location)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Event.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Event.Description)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-    </dl>
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h1 class="display-4 text-info fw-bold">User Event Details</h1>
+        <p class="lead text-muted">View all the details about this user event.</p>
+    </div>
+
+    <!-- User Details Card -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-info text-white text-center">
+            <h3 class="h5 mb-0">User Information</h3>
+        </div>
+        <div class="card-body p-4">
+            <dl class="row mb-0">
+                <!-- First Name -->
+                <dt class="col-sm-3 fw-bold text-secondary">@Html.DisplayNameFor(model => model.User.FirstName)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.User.FirstName)</dd>
+
+                <!-- Last Name -->
+                <dt class="col-sm-3 fw-bold text-secondary">@Html.DisplayNameFor(model => model.User.LastName)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.User.LastName)</dd>
+
+                <!-- Date of birth -->
+                <dt class="col-sm-3 fw-bold text-secondary">@Html.DisplayNameFor(model => model.User.DateOfBirth)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.User.DateOfBirth)</dd>
+
+                <!-- Email -->
+                <dt class="col-sm-3 fw-bold text-secondary">@Html.DisplayNameFor(model => model.User.Email)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.User.Email)</dd>
+
+                <!-- Phone number -->
+                <dt class="col-sm-3 fw-bold text-secondary">@Html.DisplayNameFor(model => model.User.PhoneNumber)</dt>
+                <dd class="col-sm-9">
+                    @if (string.IsNullOrEmpty(Model.User.PhoneNumber))
+                    {
+                        @:N/A
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(model => model.User.PhoneNumber)
+                    }
+                </dd>
+
+            </dl>
+        </div>
+    </div>
+
+    <!-- Event Details Card -->
+    <div class="card shadow-lg">
+        <div class="card-header bg-info text-white text-center">
+            <h3 class="h5 mb-0">Event Information</h3>
+        </div>
+        <div class="card-body p-4">
+            <dl class="row mb-0">
+                <!-- Title -->
+                <dt class="col-sm-3 fw-bold text-secondary">@Html.DisplayNameFor(model => model.Event.Title)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Event.Title)</dd>
+
+                <!-- Location -->
+                <dt class="col-sm-3 fw-bold text-secondary">@Html.DisplayNameFor(model => model.Event.Location)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Event.Location)</dd>
+
+                <!-- Description -->
+                <dt class="col-sm-3 fw-bold text-secondary">@Html.DisplayNameFor(model => model.Event.Description)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Event.Description)</dd>
+
+                <!-- Statud -->
+                <dt class="col-sm-3 fw-bold text-secondary">@Html.DisplayNameFor(model => model.Status)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mt-4">
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning btn-lg me-2">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+        }
+        <a asp-action="Index" class="btn btn-secondary btn-lg">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </div>
 </div>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+}
