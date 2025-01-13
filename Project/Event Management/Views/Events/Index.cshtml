@@ -1,68 +1,93 @@
 ﻿@model IEnumerable<Event_Management.Models.Event>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "All Events";
 }
 
-<h1>All Incoming Events</h1>
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="text-center mb-4">
+        <h1 class="display-4 text-primary fw-bold">All Incoming Events</h1>
+        <p class="lead text-muted">Browse and manage events effortlessly.</p>
+    </div>
 
-@using (Html.BeginForm("Index", "Events", FormMethod.Get))
-{
-    <p>
-        Title: <input type="text" name="searchTitle" value="@ViewData["SearchTitle"]" />
-        Date: <input type="date" name="searchDate" value="@ViewData["SearchDate"]" />
-        <input type="submit" value="Search" class="btn btn-primary" />
-    </p>
+    <!-- Search Section -->
+    <div class="card shadow-lg mb-4">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3">
+                <div class="col-md-5">
+                    <label for="searchTitle" class="form-label fw-bold">Title</label>
+                    <input type="text" id="searchTitle" name="searchTitle" value="@ViewData["SearchTitle"]" class="form-control" placeholder="Search by title">
+                </div>
+                <div class="col-md-4">
+                    <label for="searchDate" class="form-label fw-bold">Date</label>
+                    <input type="date" id="searchDate" name="searchDate" value="@ViewData["SearchDate"]" class="form-control">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Events Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-primary">
+                <tr class="text-center">
+                    <th>@Html.DisplayNameFor(model => model.Title)</th>
+                    <th>@Html.DisplayNameFor(model => model.Description)</th>
+                    <th>@Html.DisplayNameFor(model => model.DateTime)</th>
+                    <th>@Html.DisplayNameFor(model => model.Location)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                            <td>@item.DateTime.ToString("MMMM dd, yyyy - HH:mm")</td>
+                            <td>@Html.DisplayFor(modelItem => item.Location)</td>
+                            <td class="text-center">
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a class="btn btn-warning btn-sm me-1" asp-action="Edit" asp-route-id="@item.Id">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a class="btn btn-info btn-sm me-1" asp-action="Details" asp-route-id="@item.Id">
+                                        <i class="fas fa-info-circle"></i> Details
+                                    </a>
+                                    <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.Id">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                }
+                                else if (User.IsInRole("User"))
+                                {
+                                    <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@item.Id">
+                                        <i class="fas fa-info-circle"></i> Details
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No events found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 }
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Location)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DateTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Location)
-                </td>
-                <td>
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit |</a>
-                        <a asp-action="Details" asp-route-id="@item.Id"> Details |</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id"> Delete </a>
-                    }
-                    else if (User.IsInRole("User"))
-                    {
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                    }
-
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>

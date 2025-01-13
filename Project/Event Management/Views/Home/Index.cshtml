@@ -4,31 +4,62 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-</div>
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 text-primary fw-bold">Welcome to Event Manager</h1>
+        <p class="lead text-muted">Stay organized and never miss an event!</p>
+    </div>
 
-@if (User.IsInRole("User") && Model.Count() != 0){
-    <table class="table">
-        <tr>
-            <th>Event Name</th>
-            <th>Event Date</th>
-            <th>Event Location</th>
-            <th>Event Description</th>
-            <th>Actions</th>
-        </tr>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Event.Title</td>
-                <td>@item.Event.DateTime</td>
-                <td>@item.Event.Location</td>
-                <td>@item.Event.Description</td>
-                <td>
-                    <a class="btn btn-primary" asp-action="Accept" asp-route-id=@item.Id>Accept</a>
-                    <a class="btn btn-danger" asp-action="Reject" asp-route-id=@item.Id>Reject</a>
-                </td>
-            </tr>
-        }
-    </table>
-}
+    @if (User.IsInRole("User") && Model.Any())
+    {
+        <!-- Events Table -->
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center">
+                <h2 class="h4">Your Upcoming Events</h2>
+            </div>
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-primary">
+                            <tr class="text-center">
+                                <th>Event Name</th>
+                                <th>Date & Time</th>
+                                <th>Location</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Event.Title</td>
+                                    <td>@item.Event.DateTime.ToString("MMMM dd, yyyy - HH:mm")</td>
+                                    <td>@item.Event.Location</td>
+                                    <td>@item.Event.Description</td>
+                                    <td class="text-center">
+                                        <a class="btn btn-success btn-sm me-2" asp-action="Accept" asp-route-id="@item.Id">
+                                            <i class="fas fa-check"></i> Accept
+                                        </a>
+                                        <a class="btn btn-danger btn-sm" asp-action="Reject" asp-route-id="@item.Id">
+                                            <i class="fas fa-times"></i> Reject
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- No Events Message -->
+        <div class="alert alert-info text-center mt-4" role="alert">
+            <h4 class="alert-heading">No Events Found!</h4>
+            <p>You currently have no upcoming events. Check back later!</p>
+        </div>
+    }
+</div>
