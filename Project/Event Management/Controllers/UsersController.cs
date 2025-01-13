@@ -137,7 +137,7 @@ namespace Event_Management.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,EventId")] UserEvent userEvent)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,EventId,UserId")] UserEvent userEvent)
         {
             if (id != userEvent.Id)
             {
@@ -154,6 +154,12 @@ namespace Event_Management.Controllers
                 if (userEvents != null)
                 {
                     TempData["ErrorMessage"] = "UserEvent with these IDs already exists!";
+                    ViewData["EventId"] = new SelectList(
+                        _context.Events.Select(e => new { e.Id, e.Title }),
+                        "Id", "Title", userEvent.EventId
+                    );
+					userEvent.User = await _context.Users.FindAsync(userEvent.UserId);
+					userEvent.Event = await _context.Events.FindAsync(userEvent.EventId);
                     return View(userEvent);
                 }
 
@@ -173,6 +179,8 @@ namespace Event_Management.Controllers
                 _context.Events.Select(e => new { e.Id, e.Title }),
                 "Id", "Title", userEvent.EventId
             );
+			userEvent.User = await _context.Users.FindAsync(userEvent.UserId);
+            userEvent.Event = await _context.Events.FindAsync(userEvent.EventId);
 
             return View(userEvent);
         }
