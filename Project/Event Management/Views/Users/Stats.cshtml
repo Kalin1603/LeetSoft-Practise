@@ -2,15 +2,33 @@
     ViewData["Title"] = "Stats";
 }
 
-<h1>Stats</h1>
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h1 class="display-4 text-primary fw-bold">Event Statistics</h1>
+        <p class="lead text-muted">An overview of the events and participant engagement.</p>
+    </div>
 
-<div class="container text-center">
-    <div class="row">
-        <div class="col">
-            Total Events: @ViewBag.TotalEventsCount
+    <div class="row text-center">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h5 class="card-title text-info fw-bold">Total Events</h5>
+                    <p class="card-text display-6 text-primary fw-bold">
+                        @ViewBag.TotalEventsCount
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="col">
-            Confirmed Participants: @ViewBag.ConfirmedParticipantsPercentage %
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h5 class="card-title text-success fw-bold">Confirmed Participants</h5>
+                    <p class="card-text display-6 text-success fw-bold">
+                        @ViewBag.ConfirmedParticipantsPercentage %
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
