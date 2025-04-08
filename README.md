@@ -47,21 +47,12 @@ git clone https://github.com/Kalin1603/LeetSoft-Practise.git
 cd LeetSoft-Practise
 3. Restore Dependencies:
 
-bash
-Копиране
-Редактиране
 dotnet restore
 4. Apply Database Migrations:
 
-bash
-Копиране
-Редактиране
 dotnet ef database update
 5. Run the Application:
 
-bash
-Копиране
-Редактиране
 dotnet run
 Once started, the application will display the URLs (e.g., http://localhost:5000). Open your browser and navigate to the URL to explore the platform.
 
@@ -72,21 +63,12 @@ Fork the repository.
 
 Create a new branch:
 
-bash
-Копиране
-Редактиране
 git checkout -b feature/YourFeature
 Commit your changes:
 
-bash
-Копиране
-Редактиране
 git commit -am 'Add your feature description'
 Push to your branch:
 
-bash
-Копиране
-Редактиране
 git push origin feature/YourFeature
 Open a Pull Request.
 
@@ -94,9 +76,5 @@ Please follow standard coding practices and include clear commit messages.
 
 📄 License
 This project is licensed under the MIT License. See the LICENSE file for more details.
-
-sql
-Копиране
-Редактиране
 
 This file contains everything in one place, ready for use in your project.
